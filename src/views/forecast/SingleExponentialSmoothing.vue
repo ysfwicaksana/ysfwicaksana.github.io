@@ -1,10 +1,44 @@
 <template>
   <div>
     <div class="container px-4 py-4">
-      <h1 class="text-red-400 font-bold text-xl">
+      <h1 class="text-red-400 font-bold text-xl mb-3">
         Single Exponential Smoothing
       </h1>
+      <p class="font-bold">Input Jumlah Mahasiswa Untuk Tahun Selanjutnya</p>
+      <button
+        class="bg-blue-500 text-white px-2 py-1 rounded  font-bold hover:bg-blue-800 mt-5"
+        @click="addField"
+      >
+        Tambah Tahun
+      </button>
+      <div v-for="(input, index) in addData" :key="index" class="mb-3">
+        <label for="tahun" class="mr-3"
+          >Jumlah Mahasiswa Tahun {{ 2021 + index }}:</label
+        >
+        <input type="text" style="border:1px solid #000" v-model="input.year" />
+
+        <button
+          class="bg-red-500 text-white px-2 py-1 rounded ml-3 font-bold hover:bg-red-800"
+          @click="removeField(index)"
+          v-show="addData.length > 1"
+        >
+          x
+        </button>
+      </div>
     </div>
+    <button
+      class="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-800 ml-3"
+      @click="sesWithAddData"
+    >
+      Submit
+    </button>
+    <button
+      class="bg-gray-500 text-white px-2 py-1 rounded hover:bg-gray-800 ml-3"
+      @click="resetData"
+    >
+      Reset to Default Data
+    </button>
+
     <div class="container mx-auto">
       <table-pmb :dataset="pmb" />
 
@@ -99,6 +133,7 @@ export default {
   },
   data() {
     return {
+      addData: [{ year: "" }],
       pmb: [],
       optimalAlpha: 0,
       minimumMSE: 0,
@@ -166,6 +201,160 @@ export default {
   },
 
   methods: {
+    resetData() {
+      this.$router.go();
+    },
+    addField() {
+      this.addData.push({ year: "" });
+    },
+    removeField(index) {
+      this.addData.splice(index, 1);
+    },
+    sesWithAddData() {
+      const arrayYear = JSON.parse(JSON.stringify(this.addData));
+
+      let currentYear = 2020;
+      for (let index = 0; index < arrayYear.length; index++) {
+        let yearToString = currentYear + 1;
+
+        dataset.push({
+          period: yearToString.toString(),
+          qty: parseInt(arrayYear[index].year),
+        });
+
+        currentYear++;
+      }
+
+      this.pmb = dataset;
+
+      const sesResult = SES(dataset);
+
+      this.forecast1 = {
+        dataset: sesResult[0],
+        mse: MSE(sesResult[0]),
+        mad: MAD(sesResult[0]),
+        mape: MAPE(sesResult[0]).toFixed(2),
+      };
+      this.forecast2 = {
+        dataset: sesResult[1],
+        mse: MSE(sesResult[1]),
+        mad: MAD(sesResult[1]),
+        mape: MAPE(sesResult[1]).toFixed(2),
+      };
+      this.forecast3 = {
+        dataset: sesResult[2],
+        mse: MSE(sesResult[2]),
+        mad: MAD(sesResult[2]),
+        mape: MAPE(sesResult[2]).toFixed(2),
+      };
+      this.forecast4 = {
+        dataset: sesResult[3],
+        mse: MSE(sesResult[3]),
+        mad: MAD(sesResult[3]),
+        mape: MAPE(sesResult[3]).toFixed(2),
+      };
+      this.forecast5 = {
+        dataset: sesResult[4],
+        mse: MSE(sesResult[4]),
+        mad: MAD(sesResult[4]),
+        mape: MAPE(sesResult[4]).toFixed(2),
+      };
+      this.forecast6 = {
+        dataset: sesResult[5],
+        mse: MSE(sesResult[5]),
+        mad: MAD(sesResult[5]),
+        mape: MAPE(sesResult[5]).toFixed(2),
+      };
+      this.forecast7 = {
+        dataset: sesResult[6],
+        mse: MSE(sesResult[6]),
+        mad: MAD(sesResult[6]),
+        mape: MAPE(sesResult[6]).toFixed(2),
+      };
+      this.forecast8 = {
+        dataset: sesResult[7],
+        mse: MSE(sesResult[7]),
+        mad: MAD(sesResult[7]),
+        mape: MAPE(sesResult[7]).toFixed(2),
+      };
+      this.forecast9 = {
+        dataset: sesResult[8],
+        mse: MSE(sesResult[8]),
+        mad: MAD(sesResult[8]),
+        mape: MAPE(sesResult[8]).toFixed(2),
+      };
+
+      const minMSE = [
+        MSE(sesResult[0]),
+        MSE(sesResult[1]),
+        MSE(sesResult[2]),
+        MSE(sesResult[3]),
+        MSE(sesResult[4]),
+        MSE(sesResult[5]),
+        MSE(sesResult[6]),
+        MSE(sesResult[7]),
+        MSE(sesResult[8]),
+      ];
+
+      this.optimalAlpha = this.getMinimumMSE(sesResult, minMSE)[0].alpha;
+      this.minimumMSE = Math.min(...minMSE);
+
+      const bestForecast = this.getPropChart(
+        this.getMinimumMSE(sesResult, minMSE)
+      );
+
+      this.forecastNextPeriod = this.getMinimumMSE(sesResult, minMSE)[
+        this.getMinimumMSE(sesResult, minMSE).length - 1
+      ].result;
+
+      this.chartSeries = [
+        {
+          name: "Data PMB",
+          type: "column",
+          data: bestForecast.realQty,
+        },
+        {
+          name: "Peramalan PMB",
+          type: "line",
+          data: bestForecast.forecastQty,
+        },
+      ];
+
+      this.chartOptions = {
+        chart: {
+          height: 350,
+          type: "line",
+        },
+        stroke: {
+          width: [0, 4],
+        },
+        title: {
+          text: "Grafik Perbandingan Data Asli Dengan Peramalan PMB",
+        },
+        dataLabels: {
+          enabled: true,
+          enabledOnSeries: [1],
+        },
+        labels: bestForecast.labels,
+        xaxis: {
+          type: "category",
+        },
+        yaxis: [
+          {
+            title: {
+              text: "Data PMB",
+            },
+          },
+          {
+            opposite: true,
+            title: {
+              text: "Peramalan PMB",
+            },
+          },
+        ],
+      };
+    },
+
     generateSes() {
       //single exponential smoothing formula
       const sesResult = SES(dataset);
