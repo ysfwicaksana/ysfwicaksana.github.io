@@ -1852,12 +1852,16 @@ export default {
       for (let index = 0; index < arrayYear.length; index++) {
         let yearToString = currentYear + 1;
 
-        dataset.push({
-          period: yearToString.toString(),
-          qty: parseInt(arrayYear[index].year),
-        });
+        if (isNaN(arrayYear[index].year)) {
+          alert(`Inputan untuk tahun ${yearToString} bukan berupa angka!`);
+        } else {
+          dataset.push({
+            period: yearToString.toString(),
+            qty: parseInt(arrayYear[index].year),
+          });
 
-        currentYear++;
+          currentYear++;
+        }
       }
 
       // console.log(dataset);
