@@ -100,22 +100,18 @@ const DESHolt = (dataset) => {
 
     arrayParsing.push(arrayParsing2);
 
-    //forecast next year
+    // forecast next year
     arrayParsing.forEach((arr, i) => {
       let predict = Object.values(arr)[Object.keys(arr).length - 1];
 
       let nextForecast = {
         i: predict.i + 1,
         period: parseInt(predict.period) + 1,
-        // alpha: predict.alpha,
-        // beta: predict.beta,
-        // level: predict.level,
-        // trend: predict.trend,
         forecast: predict.level + predict.trend,
         result: Math.round(predict.level + predict.trend),
       };
 
-      arrayParsing[i].splice(7, 0, nextForecast);
+      arrayParsing[i].splice(Object.keys(arr).length, 0, nextForecast);
     });
 
     letForecast.push(arrayParsing);
@@ -123,26 +119,5 @@ const DESHolt = (dataset) => {
 
   return letForecast;
 };
-
-// else if (i === 1) {
-//           let latestForecast = Object.values(bufferForecast)[
-//             Object.keys(bufferForecast).length - 1
-//           ];
-
-//           bufferForecast.push({
-//             i: i,
-//             period: data.period,
-//             alpha: alpha,
-//             beta: beta,
-//             qty: data.qty,
-//             level: data.qty,
-//             trend: data.qty - latestForecast.qty,
-//             forecast: 0,
-//             result: 0,
-//             mad: 0,
-//             mse: 0,
-//             mape: 0,
-//           });
-//         }
 
 export default DESHolt;

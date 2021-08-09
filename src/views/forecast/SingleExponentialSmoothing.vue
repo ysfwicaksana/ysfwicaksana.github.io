@@ -201,6 +201,132 @@ export default {
   },
 
   methods: {
+    populateResult(sesResult) {
+      this.forecast1 = {
+        dataset: sesResult[0],
+        mse: MSE(sesResult[0]),
+        mad: MAD(sesResult[0]),
+        mape: MAPE(sesResult[0]).toFixed(2),
+      };
+      this.forecast2 = {
+        dataset: sesResult[1],
+        mse: MSE(sesResult[1]),
+        mad: MAD(sesResult[1]),
+        mape: MAPE(sesResult[1]).toFixed(2),
+      };
+      this.forecast3 = {
+        dataset: sesResult[2],
+        mse: MSE(sesResult[2]),
+        mad: MAD(sesResult[2]),
+        mape: MAPE(sesResult[2]).toFixed(2),
+      };
+      this.forecast4 = {
+        dataset: sesResult[3],
+        mse: MSE(sesResult[3]),
+        mad: MAD(sesResult[3]),
+        mape: MAPE(sesResult[3]).toFixed(2),
+      };
+      this.forecast5 = {
+        dataset: sesResult[4],
+        mse: MSE(sesResult[4]),
+        mad: MAD(sesResult[4]),
+        mape: MAPE(sesResult[4]).toFixed(2),
+      };
+      this.forecast6 = {
+        dataset: sesResult[5],
+        mse: MSE(sesResult[5]),
+        mad: MAD(sesResult[5]),
+        mape: MAPE(sesResult[5]).toFixed(2),
+      };
+      this.forecast7 = {
+        dataset: sesResult[6],
+        mse: MSE(sesResult[6]),
+        mad: MAD(sesResult[6]),
+        mape: MAPE(sesResult[6]).toFixed(2),
+      };
+      this.forecast8 = {
+        dataset: sesResult[7],
+        mse: MSE(sesResult[7]),
+        mad: MAD(sesResult[7]),
+        mape: MAPE(sesResult[7]).toFixed(2),
+      };
+      this.forecast9 = {
+        dataset: sesResult[8],
+        mse: MSE(sesResult[8]),
+        mad: MAD(sesResult[8]),
+        mape: MAPE(sesResult[8]).toFixed(2),
+      };
+
+      const minMSE = [
+        MSE(sesResult[0]),
+        MSE(sesResult[1]),
+        MSE(sesResult[2]),
+        MSE(sesResult[3]),
+        MSE(sesResult[4]),
+        MSE(sesResult[5]),
+        MSE(sesResult[6]),
+        MSE(sesResult[7]),
+        MSE(sesResult[8]),
+      ];
+
+      this.optimalAlpha = this.getMinimumMSE(sesResult, minMSE)[0].alpha;
+      this.minimumMSE = Math.min(...minMSE);
+
+      const bestForecast = this.getPropChart(
+        this.getMinimumMSE(sesResult, minMSE)
+      );
+
+      this.forecastNextPeriod = this.getMinimumMSE(sesResult, minMSE)[
+        this.getMinimumMSE(sesResult, minMSE).length - 1
+      ].result;
+
+      this.chartSeries = [
+        {
+          name: "Data PMB",
+          type: "column",
+          data: bestForecast.realQty,
+        },
+        {
+          name: "Peramalan PMB",
+          type: "line",
+          data: bestForecast.forecastQty,
+        },
+      ];
+
+      this.chartOptions = {
+        chart: {
+          height: 350,
+          type: "line",
+        },
+        stroke: {
+          width: [0, 4],
+        },
+        title: {
+          text: "Grafik Perbandingan Data Asli Dengan Peramalan PMB",
+        },
+        dataLabels: {
+          enabled: true,
+          enabledOnSeries: [1],
+        },
+        labels: bestForecast.labels,
+        xaxis: {
+          type: "category",
+        },
+        yaxis: [
+          {
+            title: {
+              text: "Data PMB",
+            },
+          },
+          {
+            opposite: true,
+            title: {
+              text: "Peramalan PMB",
+            },
+          },
+        ],
+      };
+    },
     resetData() {
       this.$router.go();
     },
@@ -225,264 +351,15 @@ export default {
         currentYear++;
       }
 
-      this.pmb = dataset;
-
       const sesResult = SES(dataset);
-
-      this.forecast1 = {
-        dataset: sesResult[0],
-        mse: MSE(sesResult[0]),
-        mad: MAD(sesResult[0]),
-        mape: MAPE(sesResult[0]).toFixed(2),
-      };
-      this.forecast2 = {
-        dataset: sesResult[1],
-        mse: MSE(sesResult[1]),
-        mad: MAD(sesResult[1]),
-        mape: MAPE(sesResult[1]).toFixed(2),
-      };
-      this.forecast3 = {
-        dataset: sesResult[2],
-        mse: MSE(sesResult[2]),
-        mad: MAD(sesResult[2]),
-        mape: MAPE(sesResult[2]).toFixed(2),
-      };
-      this.forecast4 = {
-        dataset: sesResult[3],
-        mse: MSE(sesResult[3]),
-        mad: MAD(sesResult[3]),
-        mape: MAPE(sesResult[3]).toFixed(2),
-      };
-      this.forecast5 = {
-        dataset: sesResult[4],
-        mse: MSE(sesResult[4]),
-        mad: MAD(sesResult[4]),
-        mape: MAPE(sesResult[4]).toFixed(2),
-      };
-      this.forecast6 = {
-        dataset: sesResult[5],
-        mse: MSE(sesResult[5]),
-        mad: MAD(sesResult[5]),
-        mape: MAPE(sesResult[5]).toFixed(2),
-      };
-      this.forecast7 = {
-        dataset: sesResult[6],
-        mse: MSE(sesResult[6]),
-        mad: MAD(sesResult[6]),
-        mape: MAPE(sesResult[6]).toFixed(2),
-      };
-      this.forecast8 = {
-        dataset: sesResult[7],
-        mse: MSE(sesResult[7]),
-        mad: MAD(sesResult[7]),
-        mape: MAPE(sesResult[7]).toFixed(2),
-      };
-      this.forecast9 = {
-        dataset: sesResult[8],
-        mse: MSE(sesResult[8]),
-        mad: MAD(sesResult[8]),
-        mape: MAPE(sesResult[8]).toFixed(2),
-      };
-
-      const minMSE = [
-        MSE(sesResult[0]),
-        MSE(sesResult[1]),
-        MSE(sesResult[2]),
-        MSE(sesResult[3]),
-        MSE(sesResult[4]),
-        MSE(sesResult[5]),
-        MSE(sesResult[6]),
-        MSE(sesResult[7]),
-        MSE(sesResult[8]),
-      ];
-
-      this.optimalAlpha = this.getMinimumMSE(sesResult, minMSE)[0].alpha;
-      this.minimumMSE = Math.min(...minMSE);
-
-      const bestForecast = this.getPropChart(
-        this.getMinimumMSE(sesResult, minMSE)
-      );
-
-      this.forecastNextPeriod = this.getMinimumMSE(sesResult, minMSE)[
-        this.getMinimumMSE(sesResult, minMSE).length - 1
-      ].result;
-
-      this.chartSeries = [
-        {
-          name: "Data PMB",
-          type: "column",
-          data: bestForecast.realQty,
-        },
-        {
-          name: "Peramalan PMB",
-          type: "line",
-          data: bestForecast.forecastQty,
-        },
-      ];
-
-      this.chartOptions = {
-        chart: {
-          height: 350,
-          type: "line",
-        },
-        stroke: {
-          width: [0, 4],
-        },
-        title: {
-          text: "Grafik Perbandingan Data Asli Dengan Peramalan PMB",
-        },
-        dataLabels: {
-          enabled: true,
-          enabledOnSeries: [1],
-        },
-        labels: bestForecast.labels,
-        xaxis: {
-          type: "category",
-        },
-        yaxis: [
-          {
-            title: {
-              text: "Data PMB",
-            },
-          },
-          {
-            opposite: true,
-            title: {
-              text: "Peramalan PMB",
-            },
-          },
-        ],
-      };
+      this.populateResult(sesResult);
     },
 
     generateSes() {
       //single exponential smoothing formula
       const sesResult = SES(dataset);
 
-      this.forecast1 = {
-        dataset: sesResult[0],
-        mse: MSE(sesResult[0]),
-        mad: MAD(sesResult[0]),
-        mape: MAPE(sesResult[0]).toFixed(2),
-      };
-      this.forecast2 = {
-        dataset: sesResult[1],
-        mse: MSE(sesResult[1]),
-        mad: MAD(sesResult[1]),
-        mape: MAPE(sesResult[1]).toFixed(2),
-      };
-      this.forecast3 = {
-        dataset: sesResult[2],
-        mse: MSE(sesResult[2]),
-        mad: MAD(sesResult[2]),
-        mape: MAPE(sesResult[2]).toFixed(2),
-      };
-      this.forecast4 = {
-        dataset: sesResult[3],
-        mse: MSE(sesResult[3]),
-        mad: MAD(sesResult[3]),
-        mape: MAPE(sesResult[3]).toFixed(2),
-      };
-      this.forecast5 = {
-        dataset: sesResult[4],
-        mse: MSE(sesResult[4]),
-        mad: MAD(sesResult[4]),
-        mape: MAPE(sesResult[4]).toFixed(2),
-      };
-      this.forecast6 = {
-        dataset: sesResult[5],
-        mse: MSE(sesResult[5]),
-        mad: MAD(sesResult[5]),
-        mape: MAPE(sesResult[5]).toFixed(2),
-      };
-      this.forecast7 = {
-        dataset: sesResult[6],
-        mse: MSE(sesResult[6]),
-        mad: MAD(sesResult[6]),
-        mape: MAPE(sesResult[6]).toFixed(2),
-      };
-      this.forecast8 = {
-        dataset: sesResult[7],
-        mse: MSE(sesResult[7]),
-        mad: MAD(sesResult[7]),
-        mape: MAPE(sesResult[7]).toFixed(2),
-      };
-      this.forecast9 = {
-        dataset: sesResult[8],
-        mse: MSE(sesResult[8]),
-        mad: MAD(sesResult[8]),
-        mape: MAPE(sesResult[8]).toFixed(2),
-      };
-
-      const minMSE = [
-        MSE(sesResult[0]),
-        MSE(sesResult[1]),
-        MSE(sesResult[2]),
-        MSE(sesResult[3]),
-        MSE(sesResult[4]),
-        MSE(sesResult[5]),
-        MSE(sesResult[6]),
-        MSE(sesResult[7]),
-        MSE(sesResult[8]),
-      ];
-
-      this.optimalAlpha = this.getMinimumMSE(sesResult, minMSE)[0].alpha;
-      this.minimumMSE = Math.min(...minMSE);
-
-      const bestForecast = this.getPropChart(
-        this.getMinimumMSE(sesResult, minMSE)
-      );
-
-      this.forecastNextPeriod = this.getMinimumMSE(sesResult, minMSE)[
-        this.getMinimumMSE(sesResult, minMSE).length - 1
-      ].result;
-
-      this.chartSeries = [
-        {
-          name: "Data PMB",
-          type: "column",
-          data: bestForecast.realQty,
-        },
-        {
-          name: "Peramalan PMB",
-          type: "line",
-          data: bestForecast.forecastQty,
-        },
-      ];
-
-      this.chartOptions = {
-        chart: {
-          height: 350,
-          type: "line",
-        },
-        stroke: {
-          width: [0, 4],
-        },
-        title: {
-          text: "Grafik Perbandingan Data Asli Dengan Peramalan PMB",
-        },
-        dataLabels: {
-          enabled: true,
-          enabledOnSeries: [1],
-        },
-        labels: bestForecast.labels,
-        xaxis: {
-          type: "category",
-        },
-        yaxis: [
-          {
-            title: {
-              text: "Data PMB",
-            },
-          },
-          {
-            opposite: true,
-            title: {
-              text: "Peramalan PMB",
-            },
-          },
-        ],
-      };
+      this.populateResult(sesResult);
     },
 
     getMinimumMSE(sesResult, minMSE) {

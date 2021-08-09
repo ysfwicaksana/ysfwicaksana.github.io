@@ -4,7 +4,40 @@
       <h1 class="text-red-400 font-bold text-xl">
         Double Exponential Smoothing - Holt Method
       </h1>
+      <p class="font-bold">Input Jumlah Mahasiswa Untuk Tahun Selanjutnya</p>
+      <button
+        class="bg-blue-500 text-white px-2 py-1 rounded  font-bold hover:bg-blue-800 mt-5"
+        @click="addField"
+      >
+        Tambah Tahun
+      </button>
+      <div v-for="(input, index) in addData" :key="index" class="mb-3">
+        <label for="tahun" class="mr-3"
+          >Jumlah Mahasiswa Tahun {{ 2021 + index }}:</label
+        >
+        <input type="text" style="border:1px solid #000" v-model="input.year" />
+
+        <button
+          class="bg-red-500 text-white px-2 py-1 rounded ml-3 font-bold hover:bg-red-800"
+          @click="removeField(index)"
+          v-show="addData.length > 1"
+        >
+          x
+        </button>
+      </div>
     </div>
+    <button
+      class="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-800 ml-3"
+      @click="desWithAddData"
+    >
+      Submit
+    </button>
+    <button
+      class="bg-gray-500 text-white px-2 py-1 rounded hover:bg-gray-800 ml-3"
+      @click="resetData"
+    >
+      Reset to Default Data
+    </button>
     <div class="container mx-auto">
       <table-pmb :dataset="pmb" />
 
@@ -534,6 +567,7 @@ import VueApexCharts from "vue3-apexcharts";
 export default {
   data() {
     return {
+      addData: [{ year: "" }],
       pmb: [],
       optimalAlpha: 0,
       optimalBeta: 0,
@@ -1043,9 +1077,7 @@ export default {
   },
 
   methods: {
-    generateDesHolt() {
-      const desHoltResult = DESHolt(dataset);
-
+    populateResult(desHoltResult) {
       //array[0]
       this.forecast1 = {
         dataset: desHoltResult[0][0],
@@ -1738,6 +1770,8 @@ export default {
         desHoltResult[8][8],
       ];
 
+      // console.log(this.getMinimumMSE(holtArray, minMSE)[0]);
+
       const { alpha, beta } = this.getMinimumMSE(holtArray, minMSE)[0];
 
       this.optimalAlpha = alpha;
@@ -1801,6 +1835,41 @@ export default {
         ],
       };
     },
+    resetData() {
+      this.$router.go();
+    },
+    addField() {
+      this.addData.push({ year: "" });
+    },
+    removeField(index) {
+      this.addData.splice(index, 1);
+    },
+
+    desWithAddData() {
+      const arrayYear = JSON.parse(JSON.stringify(this.addData));
+
+      let currentYear = 2020;
+      for (let index = 0; index < arrayYear.length; index++) {
+        let yearToString = currentYear + 1;
+
+        dataset.push({
+          period: yearToString.toString(),
+          qty: parseInt(arrayYear[index].year),
+        });
+
+        currentYear++;
+      }
+
+      // console.log(dataset);
+
+      const desHoltResult = DESHolt(dataset);
+
+      this.populateResult(desHoltResult);
+    },
+    generateDesHolt() {
+      const desHoltResult = DESHolt(dataset);
+      this.populateResult(desHoltResult);
+    },
 
     getMinimumMSE(holt, minMSE) {
       for (let i = 0; i < holt.length; i++) {
@@ -1836,5 +1905,4 @@ export default {
 };
 </script>
 
-<style>
-</style>
+<style></style>
