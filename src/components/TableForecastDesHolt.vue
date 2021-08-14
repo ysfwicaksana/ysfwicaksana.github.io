@@ -29,7 +29,9 @@
           <th class="bg-blue-100 border text-left text-xs px-2 py-1">
             Error<sup>2</sup>
           </th>
-          <th class="bg-blue-100 border text-left text-xs px-2 py-1">APE</th>
+          <th class="bg-blue-100 border text-left text-xs px-2 py-1">
+            |%error|
+          </th>
         </tr>
       </thead>
 
@@ -103,5 +105,4 @@ export default {
 };
 </script>
 
-<style>
-</style>
+<style></style>

@@ -10,6 +10,11 @@
       </router-link>
     </div>
     <div>
+      <router-link to="/">
+        <a class="text-md no-underline text-white hover:text-yellow-400 mr-3"
+          >Home</a
+        >
+      </router-link>
       <router-link to="/ses">
         <a class="text-md no-underline text-white hover:text-yellow-400 mr-3"
           >SES</a

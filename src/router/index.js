@@ -2,11 +2,12 @@ import { createRouter, createWebHistory } from "vue-router";
 
 const routes = [
   {
-    path: "/ses",
-    redirect: "/",
+    path: "/",
+    name: "best-method",
+    component: () => import("../views/forecast/BestMethod.vue"),
   },
   {
-    path: "/",
+    path: "/ses",
     name: "ses",
     component: () => import("../views/forecast/SingleExponentialSmoothing.vue"),
   },
